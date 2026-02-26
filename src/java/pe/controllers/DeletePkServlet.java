@@ -21,6 +21,7 @@ import pe.model.registration.RegistrationDAO;
  */
 @WebServlet(name = "DeletePkServlet", urlPatterns = {"/DeletePkServlet"})
 public class DeletePkServlet extends HttpServlet {
+    private final String ERROR_PAGE = "error.html";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,21 +38,29 @@ public class DeletePkServlet extends HttpServlet {
         //1. Controller se lay toan bo thong tin nguoi dung
         String username = request.getParameter("pk");
         String searchValue = request.getParameter("lastSearchValue");
+        String url = ERROR_PAGE;
         
         try {
             //2. Controller calls methods of Models
             //2.1 Controller khoi tao DAO model
             RegistrationDAO dao = new RegistrationDAO();
             //2.2 Controller calls methods of Model
-            dao.deleteAccount(username);
+            boolean result = dao.deleteAccount(username);
             //3. Controller processes result
-            
+            if(result){
+                //refresh: call previous function again
+                //--> remind
+                //==> add request parameters into url (how many? --> equals input controls)
+                url = "MainController"
+                        + "?action=Search"
+                        + "&txtSearchValue=" + searchValue;// call Search function --> only one input control
+            }//action delete is successful
         } catch (SQLException ex) {
             log("DeletePkServlet _ SQL " + ex.getMessage());
         } catch (ClassNotFoundException ex) {
             log("DeletePkServlet _ Class Not Found " + ex.getMessage());
         } finally {
-
+            response.sendRedirect(url);
         }
     }
 

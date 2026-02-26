@@ -117,7 +117,7 @@ public class RegistrationDAO implements Serializable {
 
     }
 
-    public void deleteAccount(String username)
+    public boolean deleteAccount(String username)
             throws SQLException, ClassNotFoundException {
         boolean result = false;
         Connection con = null;
@@ -142,16 +142,56 @@ public class RegistrationDAO implements Serializable {
                     result = true;
                 }// connection is available
             }
-        }finally {
-       
-        if (stm != null) {
-            stm.close();
-        }
-        if (con != null) {
-            con.close();
-        }
-        }
+        } finally {
 
-      }
+            if (stm != null) {
+                stm.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+        }
+        return result;
     }
+    
+    public boolean updateAccount(String username, String password, boolean isAdmin)
+            throws SQLException, ClassNotFoundException {
+        boolean result = false;
+        Connection con = null;
+        PreparedStatement stm = null;
 
+        try {
+            //1. Model connects DB
+            con = DbUtils.getConnection();
+            if (con != null) {
+                //2. create SQL String 15/
+                String sql = "Update  Registration "
+                        + "Set password = ?, "
+                        + "isAdmin = ? "
+                        + "Where username = ?";
+
+                //3. create Statement Object 15/
+                stm = con.prepareStatement(sql);
+                stm.setString(1, password);
+                stm.setBoolean(2, isAdmin);
+                stm.setString(3, username);
+
+                //4. Execute Query 15/
+                int effectedRows = stm.executeUpdate();
+                //5. Process result 16/
+                if (effectedRows > 0) {
+                    result = true;
+                }// connection is available
+            }
+        } finally {
+
+            if (stm != null) {
+                stm.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+        }
+        return result;
+    }
+}

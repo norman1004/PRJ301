@@ -1,29 +1,27 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 package pe.controllers;
 
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
+import java.io.PrintWriter;
+import java.sql.SQLException;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import pe.model.registration.RegistrationDAO;
 
 /**
  *
- * @author Computing Fundamental - HCM Campus
+ * @author Quoc Thai
  */
-public class MainController extends HttpServlet {
+@WebServlet(name = "UpdatePkServlet", urlPatterns = {"/UpdatePkServlet"})
+public class UpdatePkServlet extends HttpServlet {
 
-//    private static final String WELCOME="login.jsp";
-    private static final String WELCOME = "login.html";
-    private static final String LOGIN_CONTROLLER = "LoginServlet";
-    private static final String SEARCH_LASTNAME_CONTROLLER = "SearchLastNameServlet";
-    private static final String DELETE_PK_CONTROLLER = "DeletePkServlet";
-    private static final String UPDATE_PK_CONTROLLER = "UpdatePkServlet";
+    private final String ERROR_PAGE = "error.html";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,35 +35,31 @@ public class MainController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String url = WELCOME;
-        String action = request.getParameter("action");
-        try {
-            if (action == null) {
-                //do nothing
-            } else if (action.equals("Login")) { //user clicked login button
-                url = LOGIN_CONTROLLER;
-            } else {
-                switch (action) {
-                    case "Search":
-                        url = SEARCH_LASTNAME_CONTROLLER;
-                        break;
-                    case "delete":
-                        url = DELETE_PK_CONTROLLER;
-                        break;
-                    case "Update":
-                        url = UPDATE_PK_CONTROLLER;
-                        break;
-                }
+        String url = ERROR_PAGE;
+        //1. lay toan bo thong tin nguoi dung
+        String username = request.getParameter("txtUsername");
+        String password = request.getParameter("txtPassword");
+        boolean isAdmin = request.getParameter("chkAdmin") != null;
+        String lastSearchValue = request.getParameter("lastSearchValue");
+        try {            
+            //2. Controller call methods of Model
+            //2.1 controller khoi tao DAO 
+            RegistrationDAO dao = new RegistrationDAO();
+            //2.2 Controller call method of Model
+            boolean result = dao.updateAccount(username, password, isAdmin);
+            //3. Controller process result
+            if (result) {
+                url = "MainController"
+                        + "?action=Search"
+                        + "&txtSearchValue=" + lastSearchValue;
             }
-            //-----            your code here   --------------------------------
 
-            //-----            your code here   --------------------------------
-        } catch (Exception e) {
-            log("error at MainController: " + e.toString());
+        } catch (SQLException ex) {
+            log("UpdatePkServlet _ SQL " + ex.getMessage());
+        } catch (ClassNotFoundException ex) {
+            log("UpdatePkServlet _ Class Not Found " + ex.getMessage());
         } finally {
-//            request.getRequestDispatcher(url).forward(request, response);
-            RequestDispatcher rd = request.getRequestDispatcher(url);
-            rd.forward(request, response);
+            response.sendRedirect(url);
         }
     }
 
