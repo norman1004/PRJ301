@@ -154,7 +154,7 @@ public class RegistrationDAO implements Serializable {
         return result;
     }
     
-    public boolean updateAccount(String username, String password, boolean isAdmin)
+    public boolean updateAccount(RegistrationDTO account)
             throws SQLException, ClassNotFoundException {
         boolean result = false;
         Connection con = null;
@@ -172,9 +172,52 @@ public class RegistrationDAO implements Serializable {
 
                 //3. create Statement Object 15/
                 stm = con.prepareStatement(sql);
-                stm.setString(1, password);
-                stm.setBoolean(2, isAdmin);
-                stm.setString(3, username);
+                stm.setString(1, account.getPassword());
+                stm.setBoolean(2, account.isRole());
+                stm.setString(3, account.getUsername());
+
+                //4. Execute Query 15/
+                int effectedRows = stm.executeUpdate();
+                //5. Process result 16/
+                if (effectedRows > 0) {
+                    result = true;
+                }// connection is available
+            }
+        } finally {
+
+            if (stm != null) {
+                stm.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+        }
+        return result;
+    }
+    
+    public boolean creatAccount(RegistrationDTO account)
+        throws SQLException, ClassNotFoundException {
+        boolean result = false;
+        Connection con = null;
+        PreparedStatement stm = null;
+
+        try {
+            //1. Model connects DB
+            con = DbUtils.getConnection();
+            if (con != null) {
+                //2. create SQL String 15/
+                String sql = "Insert Into Registration("
+                        + "username, password, lastname, isAdmin"
+                        + ") Values("
+                        + "?, ?, ?, ?"
+                        + ")";
+
+                //3. create Statement Object 15/
+                stm = con.prepareStatement(sql);
+                stm.setString(1, account.getUsername());
+                stm.setString(2, account.getPassword());
+                stm.setString(3, account.getFullName());
+                stm.setBoolean(4, account.isRole());
 
                 //4. Execute Query 15/
                 int effectedRows = stm.executeUpdate();

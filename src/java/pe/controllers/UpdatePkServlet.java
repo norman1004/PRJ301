@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import pe.model.registration.RegistrationDAO;
+import pe.model.registration.RegistrationDTO;
 
 /**
  *
@@ -46,7 +47,8 @@ public class UpdatePkServlet extends HttpServlet {
             //2.1 controller khoi tao DAO 
             RegistrationDAO dao = new RegistrationDAO();
             //2.2 Controller call method of Model
-            boolean result = dao.updateAccount(username, password, isAdmin);
+            RegistrationDTO account = new RegistrationDTO(username, password, username, isAdmin);
+            boolean result = dao.updateAccount(account);
             //3. Controller process result
             if (result) {
                 url = "MainController"

@@ -24,6 +24,7 @@ public class MainController extends HttpServlet {
     private static final String SEARCH_LASTNAME_CONTROLLER = "SearchLastNameServlet";
     private static final String DELETE_PK_CONTROLLER = "DeletePkServlet";
     private static final String UPDATE_PK_CONTROLLER = "UpdatePkServlet";
+    private static final String CREATE_ACCOUNT_CONTROLLER = "CreateAccountServlet";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -54,6 +55,9 @@ public class MainController extends HttpServlet {
                         break;
                     case "Update":
                         url = UPDATE_PK_CONTROLLER;
+                        break;
+                    case "Create New Account":
+                        url = CREATE_ACCOUNT_CONTROLLER;
                         break;
                 }
             }
