@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -25,6 +26,8 @@ public class MainController extends HttpServlet {
     private static final String DELETE_PK_CONTROLLER = "DeletePkServlet";
     private static final String UPDATE_PK_CONTROLLER = "UpdatePkServlet";
     private static final String CREATE_ACCOUNT_CONTROLLER = "CreateAccountServlet";
+    private static final String STARTUP_CONTROLLER = "StartUpServlet";
+    private static final String SIGNOUT_CONTROLLER = "SignOutServlet";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -42,24 +45,31 @@ public class MainController extends HttpServlet {
         String action = request.getParameter("action");
         try {
             if (action == null) {
-                //do nothing
+                url = STARTUP_CONTROLLER;
             } else if (action.equals("Login")) { //user clicked login button
                 url = LOGIN_CONTROLLER;
             } else {
-                switch (action) {
-                    case "Search":
-                        url = SEARCH_LASTNAME_CONTROLLER;
-                        break;
-                    case "delete":
-                        url = DELETE_PK_CONTROLLER;
-                        break;
-                    case "Update":
-                        url = UPDATE_PK_CONTROLLER;
-                        break;
-                    case "Create New Account":
-                        url = CREATE_ACCOUNT_CONTROLLER;
-                        break;
-                }
+                //check session has existed
+                HttpSession session = request.getSession(false);
+                if (session != null) {
+                    switch (action) {
+                        case "Search":
+                            url = SEARCH_LASTNAME_CONTROLLER;
+                            break;
+                        case "delete":
+                            url = DELETE_PK_CONTROLLER;
+                            break;
+                        case "Update":
+                            url = UPDATE_PK_CONTROLLER;
+                            break;
+                        case "Create New Account":
+                            url = CREATE_ACCOUNT_CONTROLLER;
+                            break;
+                        case "signout":
+                            url = SIGNOUT_CONTROLLER;
+                            break;
+                    }
+                }//end check session
             }
             //-----            your code here   --------------------------------
 

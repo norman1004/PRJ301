@@ -7,13 +7,12 @@ package pe.controllers;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import pe.model.registration.RegistrationDAO;
 import pe.model.registration.RegistrationDTO;
 
@@ -21,11 +20,10 @@ import pe.model.registration.RegistrationDTO;
  *
  * @author Quoc Thai
  */
-public class LoginServlet extends HttpServlet {
-    
-    private final String SEARCH_PAGE = "search.jsp";
-    private final String INVALID_PAGE = "invalid.html";
-
+@WebServlet(name = "StartUpServlet", urlPatterns = {"/StartUpServlet"})
+public class StartUpServlet extends HttpServlet {
+private static final String LOGIN_PAGE = "login.html";
+private static final String SEARCH_PAGE = "search.jsp";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -38,41 +36,34 @@ public class LoginServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        String url = INVALID_PAGE;
-        //1. Controller se lay toan bo thong tin nguoi dung
-        String username = request.getParameter("txtUsername");
-        String password = request.getParameter("txtPassword");
+        String url = LOGIN_PAGE;
         
         try {
-            //2. Controller calls method Model
-            //2.1 Controller initializes DAO object
-            RegistrationDAO dao = new RegistrationDAO();
-
-            //2.2 Controller calls methods of DAO object
-//            boolean result = dao.checkLogin(username, password);
-            RegistrationDTO result = dao.checkLogin(username, password);
-            //3. Controller processes
-            if (result != null) {
-                url = SEARCH_PAGE;
-                //write cookies
-                Cookie cookie = new Cookie(username, password);
-                cookie.setMaxAge(60 * 10);
-                response.addCookie(cookie);
-                //store Sesstion scope
-                HttpSession session = request.getSession();
-                session.setAttribute("USERINFO", result);
-            }//username and password are matched
+            //1. Controller gets all cookies
+            Cookie[] cookies = request.getCookies();
+            //1.1 Check cookies have been existed
+            if (cookies != null) {
+                //1.2 Get username and password that stored 
+                Cookie newestCookie = cookies[cookies.length - 1];
+                String username = newestCookie.getName();
+                String password = newestCookie.getValue();
+                //2. Controller calls methods of Model
+                //2.1 Controller initializes DAO object
+                RegistrationDAO dao = new RegistrationDAO();
+                //2.2 Controller calls methods of DAO object
+//                boolean result = dao.checkLogin(username, password);
+                RegistrationDTO result = dao.checkLogin(username, password);
+                //3. Controller proccess result
+                if(result != null){
+                    url = SEARCH_PAGE;
+                }
+            }// end cookies are existed
         } catch (SQLException ex) {
-            log("LoginServlet_SQL " + ex.getMessage());
+            log("StartUpServlet_SQL " + ex.getMessage());
         } catch (ClassNotFoundException ex) {
-            log("LoginServlet_Class Not Found " + ex.getMessage());
-        } finally {
-            //send to Views
-            RequestDispatcher rd = request.getRequestDispatcher(url);
-            rd.forward(request, response);
-//            response.sendRedirect(url);
-            out.close();
+            log("StartUpServlet_Class Not Found " + ex.getMessage());
+        }finally {
+            response.sendRedirect(url);
         }
     }
 

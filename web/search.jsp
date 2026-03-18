@@ -4,6 +4,7 @@
     Author     : Computing Fundamental - HCM Campus
 --%>
 
+<%@page import="org.apache.jasper.tagplugins.jstl.core.ForEach"%>
 <%--<%@page import="pe.model.registration.RegistrationDTO"%>
 <%@page import="java.util.List"%>--%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -15,6 +16,13 @@
         <title>Search Page</title>
     </head>
     <body>
+        <font color="red">
+        Welcome, ${sessionScope.USERINFO.fullName}
+        </font><br/>
+        <c:url var="LogoutLink" value="MainController">
+            <c:param name="action" value="signout" />
+        </c:url>
+        <a href="${LogoutLink}">Logout</a>
         <h1>Search Page</h1>
         <form action="MainController" method="POST">
             Search Value <input type="text" name="txtSearchValue" 
@@ -40,7 +48,7 @@
                     <tbody>
                         <c:forEach items="${result}" var="dto" varStatus="counter">
                         <form action="MainController" method="POST">
-                            
+
                             <tr>
                                 <td>
                                     ${counter.count}
@@ -50,9 +58,9 @@
                                     <input type="hidden" name="txtUsername" 
                                            value="${dto.username}" />
                                 </td>
-                                <td>
+                                <td>                                 
                                     <input type="text" name="txtPassword" value="${dto.password}" />
-
+                                        
                                 </td>
                                 <td>
                                     ${dto.fullName}
@@ -150,5 +158,24 @@
 %>
 
     --%>
+    <%--<%
+            Cookie[] cookies = request.getCookies();
+            String username = null;
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if (!"JSESSIONID".equals(cookie.getName())) {
+                        username = cookie.getName();
+                        break;
+                    }
+                }
+
+        %>
+        <font color="red">
+        Welcome, <%= username %>
+        </font>
+
+        <%
+            }
+        %>--%>
 </body>
 </html>

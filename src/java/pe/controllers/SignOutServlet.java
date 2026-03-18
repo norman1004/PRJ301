@@ -2,74 +2,54 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
+
 package pe.controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import pe.model.registration.RegistrationCreateError;
-import pe.model.registration.RegistrationDAO;
-import pe.model.registration.RegistrationDTO;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author Quoc Thai
  */
-@WebServlet(name = "UpdatePkServlet", urlPatterns = {"/UpdatePkServlet"})
-public class UpdatePkServlet extends HttpServlet {
-
-    private final String ERROR_PAGE = "error.html";
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
+@WebServlet(name="SignOutServlet", urlPatterns={"/SignOutServlet"})
+public class SignOutServlet extends HttpServlet {
+    private static final String LOGIN_PAGE = "login.html";
+   
+    /** 
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String url = ERROR_PAGE;
-        //1. lay toan bo thong tin nguoi dung
-        String username = request.getParameter("txtUsername");
-        String password = request.getParameter("txtPassword");
-        boolean isAdmin = request.getParameter("chkAdmin") != null;
-        String lastSearchValue = request.getParameter("lastSearchValue");      
-        try {            
-            //2. Controller call methods of Model
-            //2.1 controller khoi tao DAO 
-            RegistrationDAO dao = new RegistrationDAO();
-            //2.2 Controller call method of Model
-//            RegistrationDTO account = new RegistrationDTO(username, password, username, isAdmin);
-            boolean result = dao.updateAccount(username, password, isAdmin);
-            //3. Controller process result
-            if (result) {
-                url = "MainController"
-                        + "?action=Search"
-                        + "&txtSearchValue=" + lastSearchValue;
+        String url = LOGIN_PAGE;
+        try {
+            //1. checking session has existed
+            HttpSession session = request.getSession(false);
+            if(session != null){
+                //2. Destroy session
+                session.invalidate();
             }
-
-        } catch (SQLException ex) {
-            log("UpdatePkServlet _ SQL " + ex.getMessage());
-        } catch (ClassNotFoundException ex) {
-            log("UpdatePkServlet _ Class Not Found " + ex.getMessage());
-        } finally {
+            
+            //3. call login back
+        }finally{
             response.sendRedirect(url);
         }
-    }
+    } 
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
+    /** 
      * Handles the HTTP <code>GET</code> method.
-     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -77,13 +57,12 @@ public class UpdatePkServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
         processRequest(request, response);
-    }
+    } 
 
-    /**
+    /** 
      * Handles the HTTP <code>POST</code> method.
-     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -91,13 +70,12 @@ public class UpdatePkServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
+    /** 
      * Returns a short description of the servlet.
-     *
      * @return a String containing servlet description
      */
     @Override

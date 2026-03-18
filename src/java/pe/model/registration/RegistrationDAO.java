@@ -19,9 +19,10 @@ import pe.utils.DbUtils;
  */
 public class RegistrationDAO implements Serializable {
 
-    public boolean checkLogin(String username, String password)
+    public RegistrationDTO checkLogin(String username, String password)
             throws SQLException, ClassNotFoundException {
-        boolean result = false;
+//        boolean result = false;
+        RegistrationDTO result = null;
         Connection con = null;
         PreparedStatement stm = null;
         ResultSet rs = null;
@@ -31,7 +32,7 @@ public class RegistrationDAO implements Serializable {
             con = DbUtils.getConnection();
             if (con != null) {
                 //2. create SQL String 15/
-                String sql = "Select username "
+                String sql = "Select [lastname], [isAdmin] "
                         + "From Registration "
                         + "Where username = ? "
                         + "and password = ?";
@@ -43,7 +44,12 @@ public class RegistrationDAO implements Serializable {
                 rs = stm.executeQuery();
                 //5. Process result 16/
                 if (rs.next()) {
-                    result = true;
+//                    result = true;
+                    String fullName = rs.getString("lastname");
+                    boolean role = rs.getBoolean("isAdmin");
+
+                    result = new RegistrationDTO(username, null, fullName, role);
+                    //luu tat ca moi thu tru password
                 }//username  and password are matched
             }// connection is available
         } finally {
@@ -59,6 +65,46 @@ public class RegistrationDAO implements Serializable {
         }
         return result;
     }
+//    public boolean checkLogin(String username, String password)
+//            throws SQLException, ClassNotFoundException {
+//        boolean result = false;
+//        Connection con = null;
+//        PreparedStatement stm = null;
+//        ResultSet rs = null;
+//
+//        try {
+//            //1. Model connects DB
+//            con = DbUtils.getConnection();
+//            if (con != null) {
+//                //2. create SQL String 15/
+//                String sql = "Select username "
+//                        + "From Registration "
+//                        + "Where username = ? "
+//                        + "and password = ?";
+//                //3. create Statement Object 15/
+//                stm = con.prepareStatement(sql);
+//                stm.setString(1, username);
+//                stm.setString(2, password);
+//                //4. Execute Query 15/
+//                rs = stm.executeQuery();
+//                //5. Process result 16/
+//                if (rs.next()) {
+//                    result = true;
+//                }//username  and password are matched
+//            }// connection is available
+//        } finally {
+//            if (rs != null) {
+//                rs.close();
+//            }
+//            if (stm != null) {
+//                stm.close();
+//            }
+//            if (con != null) {
+//                con.close();
+//            }
+//        }
+//        return result;
+//    }
 
     private List<RegistrationDTO> accounts;
 
@@ -153,8 +199,8 @@ public class RegistrationDAO implements Serializable {
         }
         return result;
     }
-    
-    public boolean updateAccount(RegistrationDTO account)
+
+    public boolean updateAccount(String username, String password, boolean role)
             throws SQLException, ClassNotFoundException {
         boolean result = false;
         Connection con = null;
@@ -172,9 +218,9 @@ public class RegistrationDAO implements Serializable {
 
                 //3. create Statement Object 15/
                 stm = con.prepareStatement(sql);
-                stm.setString(1, account.getPassword());
-                stm.setBoolean(2, account.isRole());
-                stm.setString(3, account.getUsername());
+                stm.setString(1, password);
+                stm.setBoolean(2, role);
+                stm.setString(3, username);
 
                 //4. Execute Query 15/
                 int effectedRows = stm.executeUpdate();
@@ -194,9 +240,9 @@ public class RegistrationDAO implements Serializable {
         }
         return result;
     }
-    
+
     public boolean creatAccount(RegistrationDTO account)
-        throws SQLException, ClassNotFoundException {
+            throws SQLException, ClassNotFoundException {
         boolean result = false;
         Connection con = null;
         PreparedStatement stm = null;
